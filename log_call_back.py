@@ -19,6 +19,8 @@ def check_agora_call_back(t_lines):
     check_first_remote_video_decoded(t_lines)
     # 检查onUserJoined
     check_user_joined(t_lines)
+    # 检查成功切换用户角色
+    check_changed_role_success(t_lines)
 
 def check_first_remote_audio(t_lines):
     check_first_remote_av(t_lines, log_constants.KEY_ON_FIRST_REMOTE_AUDIO, "音频首帧")
@@ -87,15 +89,15 @@ def check_user_joined(t_lines):
             userId.append(user_id)
             # print(f'userId: {user_id}')
         else:
-            print('No match found.')
+            logHandle.custom_print(log_level.LogLevel.ERROR, 'No match found.')
 
     # 找出不同的值和其数量
     count_unique, unique_values = find_unique_values(userId)
     if count_unique > 1:
-        print(f"有{count_unique}个远端的用户加入过房间,userid如下")
+        logHandle.custom_print(log_level.LogLevel.INFO, f"有{count_unique}个远端的用户加入过房间,userid如下")
         print(unique_values)
     else:
-        print(f"只有 {count_unique} 个远端的用户uid={unique_values[0]} 加入过房间")
+        logHandle.custom_print(log_level.LogLevel.INFO, f"只有 {count_unique} 个远端的用户uid={unique_values[0]} 加入过房间")
 
 
 # 找出userid的数组中有几个用户，分别都是谁
@@ -103,6 +105,35 @@ def find_unique_values(arr):
     unique_values = set(arr)
     count_unique = len(unique_values)
     return count_unique, list(unique_values)
+
+# 检测角色切换成功的通知回调
+# ChannelProxy::onChangeRoleSuccess->onClientRoleChanged(this:0x7f1177ac00, oldRole:1, newRole:1, newRoleLatencyLevel:2)
+def check_changed_role_success(t_lines):
+    crsKeyword_lines = [line for line in t_lines if re.search(log_constants.KEY_ON_CHANGED_ROLE_SUCCESS, line, re.IGNORECASE)]
+    crsKeyword_count = len(crsKeyword_lines)
+    if crsKeyword_count < 1:
+        logHandle.custom_print(log_level.LogLevel.WARNING, "没有成功切换过角色")
+        return
+    logHandle.custom_print(log_level.LogLevel.INFO, f"共切换过{crsKeyword_count}次角色,信息如下")
+
+    # 解析第一次切换角色的信息
+    # 使用正则表达式匹配 oldRole、newRole 和 newRoleLatencyLevel 的值
+    check_single_changed_role_info(crsKeyword_lines, 0)
+    if crsKeyword_count > 1:
+        # 解析最后一次切换角色的信息
+        check_single_changed_role_info(crsKeyword_lines, crsKeyword_count - 1)
+
+# 检测单次角色切换的信息
+def check_single_changed_role_info(lines, index):
+    match = re.search(r'oldRole:(\d+), newRole:(\d+), newRoleLatencyLevel:(\d+)', lines[index])
+    if match:
+        # 获取匹配到的值
+        old_role = match.group(1)
+        new_role = match.group(2)
+        latency_level = match.group(3)
+        logHandle.custom_print(log_level.LogLevel.INFO, f'第{index}次切换用户角色, oldRole: {old_role}, newRole: {new_role}, newRoleLatencyLevel: {latency_level}')
+    else:
+        logHandle.custom_print(log_level.LogLevel.ERROR, 'No match found.')
 
 
 # 比较数组中的时间是否相近

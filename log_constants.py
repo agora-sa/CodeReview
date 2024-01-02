@@ -8,6 +8,9 @@ log_message = "ChannelProxy::onUserJoined->onUserJoined(this:0x6f09d09700, userI
 
 
 
+
+
+
 # 关键字常量
 # 版本号
 KEY_VERSION = "Agora SDK ver"
@@ -76,5 +79,7 @@ KEY_ON_FIRST_REMOTE_AUDIO_DECODED ="ChannelProxy::onFirstRemoteAudioDecoded"
 KEY_ON_FIRST_REMOTE_VIDEO_DECODED ="ChannelProxy::onFirstRemoteVideoDecoded"
 # ChannelProxy::onUserJoined
 KEY_ON_USER_JOINED = "ChannelProxy::onUserJoined"
+# ChannelProxy::onChangeRoleSuccess
+KEY_ON_CHANGED_ROLE_SUCCESS = "ChannelProxy::onChangeRoleSuccess"
 
 
