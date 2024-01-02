@@ -1,0 +1,59 @@
+日志共: 8716 行
+日志 从: 2023-11-17 17:23:31.571000 到 2023-11-20 12:07:41.764000
+用户使用sdk版本号: 4.1.1.19, 构建号: 280271
+【WARNING】出现版本号信息共: 26 次,说明执行引擎create13次左右
+版本号和build信息如下
+发现[rp]相关日志205次
+共设置通信模式:13次
+【WARNING】用户只设置过直播模式，最后一次设置是在2023-11-20 10:19:36.980000
+出现keyFrameInterval_key:10次
+【WARNING】用户只设置过关键帧间隔是1,最后一次设置是在2023-11-20 10:19:36.981000
+---- 以上是sdk基本信息的体检报告 ----
+
+引擎共创建: 13 次
+创建引擎的详细信息如下
+【WARNING】存在两次创建引擎的间隔小于500ms,请检查下是否需要频繁创建
+【WARNING】请检查1700213333432和1700213333448这两次，这里只列举一次
+引擎共销毁: 0 次
+【WARNING】创建和销毁引擎的次数不匹配,请检查下。
+【WARNING】提示：引擎的创建或销毁执行一次为最佳！
+---- 以上是sdk引擎信息的体检报告 ----
+
+共加入频道: 0 次
+加入频道成功共: 0 次
+加入频道成功次数 = 加入频道次数，此项忽略
+共离开频道: 0 次
+---- 以上是频道信息的体检报告 ----
+
+调用enableLocalVideo共: 52 次
+【WARNING】检查下是否有必要频繁调用enableLocalVideo接口
+最后一次调用信息如下
+ [11/20/23 10:19:36:981][1837105][A]:(00001350):     RtcEngine::enableLocalVideoInternal(this:0x1690a64d0, enabled:1)
+
+调用enableLocalAudio共: 26 次
+【WARNING】检查下是否有必要频繁调用enableLocalAudio接口
+最后一次调用如下
+[11/20/23 10:19:36:981][1837105][A]:(00001341):     RtcEngine::enableLocalAudioInternal(this:0x1690a64d0, enabled:1)
+
+调用enableAudio共: 0 次
+调用enableVideo共: 13 次
+【WARNING】检查下是否有必要频繁调用enableVideo接口
+最后一次调用如下
+[11/20/23 10:19:36:981][1837105][U]:(00001347): RtcEngine::enableVideo(this:0x1690a64d0, void)
+
+调用disableAudio共: 0 次
+调用disableVideo共: 0 次
+---- 以上是av_enable信息的体检报告 ----
+
+调用muteLocalVideoStream共: 3 次
+最后一次调用如下
+[11/17/23 17:29:19:292][1701027][A]:(00001680): RtcConnectionImpl::muteLocalVideo(this:0x12ab47cf0, mute:1)
+
+调用muteLocalAudioStream共: 3 次
+最后一次调用如下
+[11/17/23 17:29:19:292][1701027][A]:(00001677): RtcConnectionImpl::muteLocalAudio(this:0x12ab47cf0, mute:1)
+
+调用muteRemoteVideoStream共: 0 次
+调用muteLocalAudioStream共: 0 次
+---- 以上是订阅/发布流信息的体检报告 ----
+
