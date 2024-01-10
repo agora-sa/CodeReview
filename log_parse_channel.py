@@ -59,7 +59,7 @@ def check_channel_join_and_leave(t_lines):
     if (success_count == len(joinChannel_lines)):
         logHandle.custom_print(log_level.LogLevel.INFO, "加入频道成功次数 = 加入频道次数，此项忽略")
     else:
-        logHandle.custom_print(log_level.LogLevel.WARNING, "加入频道成功次数!=加入频道次数,需要检查")
+        logHandle.custom_print(log_level.LogLevel.WARNING, "加入频道成功次数!=加入频道次数,请检查频道是否加入成功,可以看下onError回调中的原因")
 
     leaveChannel_lines = [line for line in t_lines if re.search(log_constants.KEY_LEAVE_CHANNEL, line, re.IGNORECASE)]
     logHandle.custom_print(log_level.LogLevel.INFO, f"共离开频道: {len(leaveChannel_lines)} 次")

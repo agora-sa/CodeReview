@@ -19,8 +19,8 @@ import log_constants
 
 from log_parse_handle import LogHandle
 
-# 定义匹配版本号和构建号的正则表达式
-pattern = r'ver (\d+\.\d+\.\d+\.\d+) build (\d+)'
+# 定义版本号和 build 号的正则表达式
+version_build_pattern = r"ver\s+(\S+)\s+build\s+(\S+)"
 # 定义匹配的正则表达式，同时匹配rp和rtc\.channel_profile
 cp_pattern = r'\[rp\].*?"rtc\.channel_profile":\d+|.*?\[rtc\.channel_profile\].*?"rtc\.channel_profile":\d+'
 
@@ -30,13 +30,13 @@ logHandle = LogHandle()
 
 def check_log_basic_info(t_lines):
     if not check_log_integrality(t_lines):
-        logHandle.custom_print(log_level.LogLevel.WARNING, "日志文件不完整，没有加入到声网的房间。")
-    check_encode_mode(t_lines)
-    check_decode_mode(t_lines)
+        logHandle.custom_print(log_level.LogLevel.WARNING, "日志文件不完整，没有加入过声网的房间")
     check_log_lines(t_lines)
     bewteen_start_end_time(t_lines)
     check_sdk_version(t_lines)
     check_channel_profile(t_lines)
+    check_encode_mode(t_lines)
+    check_decode_mode(t_lines)
     logHandle.custom_print(log_level.LogLevel.PARTING, "---- 以上是sdk基本信息的体检报告 ----\n")
     return True;
 
@@ -84,11 +84,11 @@ def check_encode_mode(t_lines):
         value = match.group(1)
         # rint(f'hw_encoder_accelerating value: {value}')
         if value == "0":
-            logHandle.custom_print(log_level.LogLevel.INFO, "使用的是软编")
+            logHandle.custom_print(log_level.LogLevel.INFO, "编码方式:软编")
         elif value == "1":
-            logHandle.custom_print(log_level.LogLevel.INFO, "使用的是硬编")
+            logHandle.custom_print(log_level.LogLevel.INFO, "编码方式:硬编")
     else:
-        print('没有找到使用的编码方式')
+        logHandle.custom_print(log_level.LogLevel.INFO, "没有找到使用的编码方式")
 
 # 检查解码方式
 # hw_encoder_accelerating 0-软解、1-硬解
@@ -101,9 +101,9 @@ def check_decode_mode(t_lines):
         value = match.group(1)
         # print(f'hw_decoder_accelerating value: {value}')
         if int(value) == 0:
-            logHandle.custom_print(log_level.LogLevel.INFO, "使用的是软解")
+            logHandle.custom_print(log_level.LogLevel.INFO, "解码方式:软解")
         elif int(value) == 1:
-            logHandle.custom_print(log_level.LogLevel.INFO, "使用的是硬解")
+            logHandle.custom_print(log_level.LogLevel.INFO, "解码方式:硬解")
     else:
         logHandle.custom_print(log_level.LogLevel.INFO, "没有找到使用的解码方式")
 
@@ -136,7 +136,7 @@ def check_sdk_version(t_lines):
     verKeyword_count = len(versionKeyword_lines)
 
     # 使用正则表达式进行匹配
-    match = re.search(pattern, versionKeyword_lines[0])
+    match = re.search(version_build_pattern, versionKeyword_lines[0])
     # 如果匹配成功，则提取版本号和构建号
     if match:
         version = match.group(1)

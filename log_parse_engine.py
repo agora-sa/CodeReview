@@ -75,7 +75,7 @@ def check_engine_creation_and_destruction(t_lines):
     process_engine_lines(engineKeyword_lines_release, "销毁")
 
     if len(engineKeyword_lines_init) != len(engineKeyword_lines_release):
-        logHandle.custom_print(log_level.LogLevel.WARNING, "创建和销毁引擎的次数不匹配,请检查下。")
+        logHandle.custom_print(log_level.LogLevel.WARNING, "创建和销毁引擎的次数不匹配,请检查。")
 
     if len(engineKeyword_lines_init) > 1 or len(engineKeyword_lines_release) > 1:
         logHandle.custom_print(log_level.LogLevel.WARNING, "提示：引擎的创建或销毁执行一次为最佳！")

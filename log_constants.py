@@ -3,6 +3,10 @@
 DATA_FORMAT = "%m/%d/%y %H:%M:%S:%f"
 TIME_PATTERN = r'\[(\d{2}/\d{2}/\d{2} \d{2}:\d{2}:\d{2}:\d{3})\]'
 
+# 解析onConnectionStateChanged相关
+STATE_PATTERN = r"\[(.*?)\]\[(.*?)\]\[(.*?)\]:(.*?): *(.*)"
+STATE_DETAILS_PATTERN = r"ChannelProxy::emitConnStateChanged->onConnectionStateChanged\(this:(.*?), state:(.*?), reason:(.*?)\)"
+
 # 解析onUserJoined中的userId
 log_message = "ChannelProxy::onUserJoined->onUserJoined(this:0x6f09d09700, userId:\"5\")"
 
@@ -81,5 +85,7 @@ KEY_ON_FIRST_REMOTE_VIDEO_DECODED ="ChannelProxy::onFirstRemoteVideoDecoded"
 KEY_ON_USER_JOINED = "ChannelProxy::onUserJoined"
 # ChannelProxy::onChangeRoleSuccess
 KEY_ON_CHANGED_ROLE_SUCCESS = "ChannelProxy::onChangeRoleSuccess"
+# emitConnStateChanged->onConnectionStateChanged
+KEY_ON_CONNECTION_STATE_CHANGED = "emitConnStateChanged->onConnectionStateChanged"
 
 

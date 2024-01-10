@@ -11,9 +11,9 @@
             "program": "${workspaceFolder}/log_parse.py",
             "args": [
                 "-f",
-                "/Users/wangwei02/Desktop/agorasdk1.log",
-                // "-o",
-                // "/Users/wangwei02/Desktop/output3.log",
+                "/Users/wangwei02/Desktop/agorasdk.log",
+                "-o",
+                "/Users/wangwei02/Desktop/output.log",
                 "-d",
                 "all"
             ],

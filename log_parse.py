@@ -45,6 +45,8 @@ def start_process_log(t_lines):
     if not t_lines:
         logHandle.custom_print(log_level.LogLevel.WARNING, "读取文件后解析出错")
         return
+    logHandle.custom_print(log_level.LogLevel.INFO, "【*** 您的集成代码体检报告已生成，请查阅 ***】\n")
+
     # 基本信息相关体检
     log_parse_basic.check_log_basic_info(t_lines)
     # 声网引擎相关体检

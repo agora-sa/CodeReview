@@ -3,6 +3,7 @@ import log_level
 import log_constants
 from datetime import datetime
 from log_parse_handle import LogHandle
+from collections import defaultdict
 
 # if __name__ == "__main__":
 logHandle = LogHandle()
@@ -21,6 +22,8 @@ def check_agora_call_back(t_lines):
     check_user_joined(t_lines)
     # 检查成功切换用户角色
     check_changed_role_success(t_lines)
+    # 检查onConnectionStateChanged
+    check_connection_state_changed(t_lines)
 
 def check_first_remote_audio(t_lines):
     check_first_remote_av(t_lines, log_constants.KEY_ON_FIRST_REMOTE_AUDIO, "音频首帧")
@@ -122,6 +125,86 @@ def check_changed_role_success(t_lines):
     if crsKeyword_count > 1:
         # 解析最后一次切换角色的信息
         check_single_changed_role_info(crsKeyword_lines, crsKeyword_count - 1)
+
+# 检查网络等连接的状态
+def check_connection_state_changed(t_lines):
+    ccscKeyword_lines = [line for line in t_lines if re.search(log_constants.KEY_ON_CONNECTION_STATE_CHANGED, line, re.IGNORECASE)]
+    ccscKeyword_count = len(ccscKeyword_lines)
+    if ccscKeyword_count < 1:
+        logHandle.custom_print(log_level.LogLevel.WARNING, "没有检测到onConnectionStateChanged回调")
+        return
+    logHandle.custom_print(log_level.LogLevel.INFO, f"onConnectionStateChanged回调{ccscKeyword_count}次,信息如下")
+
+
+    # 使用 defaultdict 来按照 'this' 字段的值进行分类存储
+    logs_by_this = defaultdict(list)
+    for line in ccscKeyword_lines:
+        # 使用正则表达式解析日志行
+        match = re.match(log_constants.STATE_PATTERN, line)
+        if match:
+            date_time, process_id, logL, log_identifier, details = match.groups()
+            # 进一步解析括号中的信息
+            details_match = re.match(log_constants.STATE_DETAILS_PATTERN, details)
+            if details_match:
+                this_value, state_value, reason_value = details_match.groups()
+                # 将信息存储到集合中，可以选择使用字典形式存储更有结构化
+                log_data = {
+                    "dateTime": date_time,
+                    "precessId": process_id,
+                    "logLevel": logL,
+                    "logIdentifier": log_identifier,
+                    "logDetails": {
+                        "this": this_value,
+                        "state": state_value,
+                        "reason": reason_value
+                    }
+                }
+                # 将结果按照 this字段的值进行分类存储到logs_by_this中
+                logs_by_this[this_value].append(log_data)
+            else:
+                print("无法解析详细信息")
+        else:
+            print("无法解析日志行")
+
+
+    # 对logs_by_this中的数据进行进一步分析处理
+    process_assembled_data(logs_by_this)
+
+# 继续解析处理好的数据
+def process_assembled_data(logs_by_this):
+    connection_data_len = len(logs_by_this)
+    logHandle.custom_print(log_level.LogLevel.INFO, f"共创建了{connection_data_len}次eventHandle对象,正常情况下引擎同样被create了{connection_data_len}次")
+
+    for this_value, logs in logs_by_this.items():
+        logHandle.custom_print(log_level.LogLevel.INFO, f"object addr': {this_value}")
+        # 1、如果有2没有3，直接判断是网络原因
+        has_state_2 = any('state' in log['logDetails'] and log['logDetails']['state'] == '2' for log in logs)
+        has_state_3 = any('state' in log['logDetails'] and log['logDetails']['state'] == '3' for log in logs)
+        if has_state_2 and not has_state_3:
+            logHandle.custom_print(log_level.LogLevel.WARNING, f"{this_value}这次没有连接成功,请检查网络!")
+        
+        # 2、是不是正常顺序
+        # 期望的 state 和 reason 顺序
+        expected_state_order = [2, 3, 1]
+        expected_reason_order = [0, 1, 5]
+        # 提取实际的 state 和 reason 顺序
+        actual_state_order = [int(log['logDetails']['state']) for log in logs]
+        actual_reason_order = [int(log['logDetails']['reason']) for log in logs]
+
+        # 判断 state 和 reason 的顺序是否符合期望
+        if actual_state_order == expected_state_order and actual_reason_order == expected_reason_order:
+            logHandle.custom_print(log_level.LogLevel.WARNING, f"state的回调顺序是 2、3、1, reason的回调顺序是 0、1、5, 符合预期")
+        else:
+            logHandle.custom_print(log_level.LogLevel.WARNING, f"state或reason 的顺序不符合预期")
+            logHandle.custom_print(log_level.LogLevel.WARNING, f"实际state的回调顺序是:{actual_state_order}, 实际reason的回调顺序是{actual_reason_order}")
+
+        # 3、如果是 'all',打印reason
+        logHandle.custom_print(log_level.LogLevel.INFO, f"详细信息如下")
+        if logHandle.print_detail == "all":
+            for log in logs:
+                logHandle.custom_print(log_level.LogLevel.INFO, f"  {log}")
+            
+    
 
 # 检测单次角色切换的信息
 def check_single_changed_role_info(lines, index):

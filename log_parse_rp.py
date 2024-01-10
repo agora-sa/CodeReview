@@ -62,7 +62,10 @@ def check_channel_profile(t_lines):
 def check_key_frame_interval(t_lines):
     kiKeyword_lines = [line for line in t_lines if re.search(keyFrameInterval_key, line, re.IGNORECASE)]
     kiKeyword_count = len(kiKeyword_lines)
-    logHandle.custom_print(log_level.LogLevel.INFO, f"出现keyFrameInterval_key:{kiKeyword_count}次")
+
+    if kiKeyword_count == 0:
+        logHandle.custom_print(log_level.LogLevel.INFO, f"没有设置过关键帧间隔")
+        return
 
     keyFrameInterval = set()
     if kiKeyword_count > 0:
@@ -86,6 +89,5 @@ def check_key_frame_interval(t_lines):
         logHandle.custom_print(log_level.LogLevel.WARNING, f"用户只设置过关键帧间隔是{list_data[0]},最后一次设置是在{date_time}")
     else:
         logHandle.custom_print(log_level.LogLevel.WARNING, "用户设置过多个关键帧间隔，分别是：")
-        print("用户设置过多个关键帧间隔，分别是：")
         for value in keyFrameInterval:
             logHandle.custom_print(log_level.LogLevel.WARNING, f"{value}")
