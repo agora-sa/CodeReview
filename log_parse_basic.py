@@ -134,7 +134,10 @@ def bewteen_start_end_time(t_lines):
 def check_sdk_version(t_lines):
     versionKeyword_lines = [line for line in t_lines if re.search(log_constants.KEY_VERSION, line, re.IGNORECASE)]
     verKeyword_count = len(versionKeyword_lines)
-
+    print(f"verKeyword_count {verKeyword_count}")
+    if verKeyword_count < 1:
+        logHandle.custom_print(log_level.LogLevel.WARNING, "没有发现有版本好信息")
+        return
     # 使用正则表达式进行匹配
     match = re.search(version_build_pattern, versionKeyword_lines[0])
     # 如果匹配成功，则提取版本号和构建号

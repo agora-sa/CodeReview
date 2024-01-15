@@ -74,4 +74,11 @@ def check_channel_join_and_leave(t_lines):
         log_parse_util.has_adjacent_difference_one(joinTimestamps, joinTimestamps, "存在加入频道和离开频道时间间隔很小的情况")
     else:
         log_parse_util.has_adjacent_difference_one2(joinTimestamps, joinTimestamps, "加入频道和离开频道综合存在间隔很小的情况，检查即可")
+
+
+    # 解析处理用户最后一次加入频道、最后一次接入频道成功、最后一次离开频道的时间的信息
+    # 1、最后一次加入频道
+    # last_join_line = joinChannel_lines[len(joinChannel_lines)]
+    # logHandle.custom_print(log_level.LogLevel.WARNING, "---- 以上是频道信息的体检报告 ----\n")
+
     logHandle.custom_print(log_level.LogLevel.PARTING, "---- 以上是频道信息的体检报告 ----\n")

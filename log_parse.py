@@ -10,6 +10,7 @@ python3 log_parse.py /xxx/xxx.log, 其中 /xxx/xx.log为要解析的log文件的
 本工程目前是单线程运行模式，后面看具体的运行情况在看是否调整线程模式
 """
 
+import os
 import argparse
 import log_level
 import sys
@@ -62,13 +63,34 @@ def start_process_log(t_lines):
     # 声网回调相关
     log_call_back.check_agora_call_back(t_lines)
 
+# 合并多个sdk log文件
+def merged_file(input_dir):
+    # 设定输出文件的名称
+    output_file = input_dir + "/merged_log.log"
+    # 使用 with 语句确保文件正确关闭
+    with open(output_file, 'w') as outfile:
+        # 遍历目录中的所有文件
+        for filename in os.listdir(input_dir):
+            # 检查文件名是否以 .log 结尾且包含 "agorasdk"
+            if filename.endswith('.log') and ('agorasdk' in filename or 'sdk' in filename):
+                # 构建完整的文件路径
+                filepath = os.path.join(input_dir, filename)
+                # 以只读模式打开每个日志文件
+                with open(filepath, 'r') as readfile:
+                    # 将文件内容写入输出文件
+                    outfile.write(readfile.read())
+                    # 可选：写入一个换行符以分隔不同的日志文件
+                    outfile.write("\n")
+
+    print("包含 'agorasdk' 的日志文件已合并到", output_file)
+
 # main
 if __name__ == "__main__":
     parser = argparse.ArgumentParser(description="log file analyzer")
     # 添加命令行参数
     # python3 log_parse.py -h 查看参数的帮助信息
     # 要解析的日志文件的绝对路径，不传会print提示信息
-    parser.add_argument('-f', '--input', help='The input file path.')
+    parser.add_argument('-i', '--input', help='The input file path.')
     # 体检报告的文件输出路径，有这个路径就输出到文件，没有就直接print的控制台
     parser.add_argument('-o', '--output', help='The output file path.')
     # 输出日志的详细程度，支持三种模式
@@ -81,7 +103,7 @@ if __name__ == "__main__":
     input_path = "" if args.input is None else args.input
     if (input_path == ''):
         print('您要解析的文件，给一个？')
-        print('您可以类似这样做：python3 log_parse.py -f /xx/xx.log -o /xx/xx.log -d all|sample|warning')
+        print('您可以类似这样做:python3 log_parse.py -f /xx/xx.log -o /xx/xx.log -d all|sample|warning')
         sys.exit()
 
     output_path = "" if args.output is None else args.output
@@ -89,5 +111,12 @@ if __name__ == "__main__":
     detail_info = "" if args.detail is None else args.detail
     logHandle.init_print_detail(detail_info)
 
+
+    # 首先合并文件
+    # 1、用户input一个日志文件的目录，这个目录下面可能有一个文件也可能有多个文件
+    # 2、这里会将包含 sdk 或 agorasdk的.log文件合并到一个.log文件中
+    # 3、将合并后的文件merged_log.log（这个文件对用户无感知）作为输入进行analyze
+    # 4、将分析后的结果输出到客户指定的output_path中
+    merged_file(input_path)
     # 开始日志文件全面体检
-    analyze_log(args.input)
+    analyze_log(input_path + "/merged_log.log")
